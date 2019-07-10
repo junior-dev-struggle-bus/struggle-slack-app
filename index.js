@@ -2,6 +2,13 @@
 require("dotenv").config();
 const axios = require("axios");
 
+// Usage from the command line:
+// npm install
+// node index sourceChannel targetChannel
+// e.g. node index general dev-chatter
+
+// Note: Do not include the hashtag in the channel name. Though I did account for stripping the hashtag away, process.argv returns undefined if the hashtag is present and I'm unsure of why.
+
 // Store Slack access token in a .env file in the root folder
 const accessToken = process.env.SLACK_ACCESS_TOKEN;
 

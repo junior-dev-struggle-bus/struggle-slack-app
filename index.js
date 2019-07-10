@@ -10,6 +10,8 @@ const axios = require("axios");
 // Note: Do not include the hashtag in the channel name. Though I did account for stripping the hashtag away, process.argv returns undefined if the hashtag is present and I'm unsure of why.
 
 // Store Slack access token in a .env file in the root folder
+// You can ping a JDSB admin on Slack for the OAuth token, or request to become a collaborator on the app.
+// The token for an app can be found by selecting the app from api.slack.com/apps and navigating to "OAuth & Permissions" page after it has been installed to a workspace.
 const accessToken = process.env.SLACK_ACCESS_TOKEN;
 
 async function getConversationId(conversation) {

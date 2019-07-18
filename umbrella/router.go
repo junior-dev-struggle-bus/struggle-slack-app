@@ -9,15 +9,14 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 )
 
 const (
-	slackAppSigningSecretKey     = "" // TODO Inject via env var.
 	slackAuthNTokenHeader        = "x-slack-signature"
 	slackRequestTimestampHeader  = "x-slack-request-timestamp"
 	slackVersionNumber           = "v0"
-	slackBodyHeader              = "text"
 	slackMessageDelimiter        = ":"
 	statusForbiddenMsgFmt        = "uh uh uh...you didn't say the magic word. (%s)"
 	statusInternalServerErrorFmt = "Sorry...we uh...messed up. (%s)"
@@ -26,12 +25,17 @@ const (
 	logHmacInfoStatement         = "\nauthNToken: %s\nexpectedAuthNToken: %s\n"
 )
 
+var (
+	// Configured in Netlify's environment variables.
+	slackAppSigningSecretKey = os.Getenv("SLACK_SIGNING_SECRET_KEY")
+)
+
 // Handles things...duh
 // 1. Authenticate the request.
 // 2. Route the request to the appropriate function.
 //   * Extract the function name from the request.
 //   * Check whether the function name exists.
-//   * Retrieves a function URL endpoint to send request to.
+//   * Retrieves a function URL endpoint to send a request to.
 //   * Create/send request to endpoint with arguments from this request.
 // 3. Send immediate status OK reponse to caller unless authN failed.
 // 4. Create/send a request to response_url once response returns from endpoint.

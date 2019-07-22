@@ -2,7 +2,9 @@
 [build]
   command = "make build"
   functions = "./functions"
+  publish = "public/"
 [build.environment]
+  ROUTER_REGISTRY_URL_ENV_VAR = "https://serverless-router-tester.netlify.com/registry.json"
   GO_IMPORT_PATH = "github.com/phoenixcoder/serverless-request-router"
   GOBIN = "/opt/build/repo/functions"
 

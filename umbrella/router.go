@@ -32,25 +32,6 @@ const (
 	slackCmdParam           = "command"
 	slackArgsParam          = "text"
 	slackResponseUrlParam   = "response_url"
-	// TODO Download registry during worker setup.
-	tempCmdReg = `{
-    "struggle" : {
-        "requestUrl" : "https://admiring-meninsky-dcfbdb.netlify.com/.netlify/functions/",
-        "helpKeyword" : "help",
-        "functions" : {
-            "functionName" : {
-                "usage" : "/struggle functionname arg1 arg2 arg3...",
-                "description" : "This describes what your function does when they use /struggle help functionName. This should also describe how it uses the arguments.",
-                "manual" : "Optional documentation website for your command."
-            },
-            "randxkcd" : {
-                "usage" : "/struggle randxkcd",
-                "description" : "Returns a random xkcd comic.",
-                "manual" : "THERE IS NO DOCUMENTATION WEBSITE. FIGURE IT OUT YOURSELF! -YOUR GRUMPY PHOENIXCODER"                
-            }
-        }
-    }
-}`
 )
 
 var (

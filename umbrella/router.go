@@ -11,22 +11,27 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"path"
 	"strings"
 	"time"
 )
 
 const (
-	timeout               = 2
-	forbiddenErrRespMsg   = "uh uh uh...you didn't say the magic word."
-	internalErrRespMsg    = "Sorry...we uh...messed up."
-	logMsg                = "%s, %s"
-	commandRegistryLoc    = "./registry.json"
-	cmdRequestUrlRoot     = "requestUrl"
-	cmdFunctionsReg       = "functions"
-	slackCmdParam         = "command"
-	slackArgsParam        = "text"
-	slackResponseUrlParam = "response_url"
+	timeout             = 2
+	forbiddenErrRespMsg = "uh uh uh...you didn't say the magic word."
+	internalErrRespMsg  = "Sorry...we uh...messed up."
+	// TODO Make sure internal error messages are transferred across more friendly-like.
+	funcNotFoundErrMsgFmt   = "We're embarrassed for you, but we don't know a '%s'. Try these instead:\n'%s'"
+	logMsg                  = "%s, %s"
+	routerRegistryUrlEnvVar = "ROUTER_REGISTRY_URL_ENV_VAR"
+	commandRegistryLoc      = "./registry.json"
+	cmdRequestUrlRoot       = "requestUrl"
+	cmdFunctionsReg         = "functions"
+	contentTypeHeader       = "content-type"
+	slackCmdParam           = "command"
+	slackArgsParam          = "text"
+	slackResponseUrlParam   = "response_url"
 	// TODO Download registry during worker setup.
 	tempCmdReg = `{
     "struggle" : {
@@ -41,7 +46,7 @@ const (
             "randxkcd" : {
                 "usage" : "/struggle randxkcd",
                 "description" : "Returns a random xkcd comic.",
-                "manual" : "THERE IS NO DOCUMENTATION WEBSITE. MAKE YOUR OWN."                
+                "manual" : "THERE IS NO DOCUMENTATION WEBSITE. FIGURE IT OUT YOURSELF! -YOUR GRUMPY PHOENIXCODER"                
             }
         }
     }
@@ -52,6 +57,7 @@ var (
 	// TODO Convert this registry to a generic Data Access Object (DAO)
 	//      that can pull from any data source.
 	commandRegistry map[string]cmdInfo
+	registryUrl     = os.Getenv(routerRegistryUrlEnvVar)
 )
 
 type cmdInfo struct {
@@ -69,7 +75,9 @@ type funcRoutingInfo struct {
 	Manual      string
 }
 
+// TODO Generalize away from Slack patterns.
 func getFuncRoutingInfo(values url.Values, cmdReg *map[string]cmdInfo) (*funcRoutingInfo, error) {
+	// TODO Polish the error handling here for Slack.
 	cmdList, cmdOk := values[slackCmdParam]
 	if !cmdOk {
 		return nil, errors.New("Command argument was not received.")
@@ -126,7 +134,6 @@ func loadCommandRegistryFromFile(location string, registry *map[string]cmdInfo) 
 	if err != nil {
 		log.Fatalf("Could not open and read function registry. Error: %v\n", err)
 	}
-
 	log.Printf("%s\n", contents)
 
 	loadCommandRegistryFromContents(contents, registry)
@@ -136,6 +143,21 @@ func loadCommandRegistryFromContents(contents []byte, registry *map[string]cmdIn
 	if err := json.Unmarshal(contents, registry); err != nil {
 		log.Fatalf("Could not unmarshal registry contents. Error: %v\n", err)
 	}
+}
+
+func loadCommandRegistryFromUrl(url string, registry *map[string]cmdInfo) {
+	log.Printf("Registry URL: %s\n", url)
+	resp, err := http.Get(url)
+	if err != nil {
+		log.Fatalf("Could not download registry contents. Error: %v\n", err)
+	}
+
+	contents, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatalf("Could not read registry contents. Error: %v\n", err)
+	}
+
+	loadCommandRegistryFromContents(contents, registry)
 }
 
 func setInternalErrCode(resp *events.APIGatewayProxyResponse, reason string) {
@@ -214,8 +236,8 @@ func handler(request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResp
 }
 
 func routeRequestWaitForResp(routeInfo *funcRoutingInfo, request *events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
-	log.Printf("Routing Info: '%+v'", *routeInfo)
-	log.Printf("Request to Route: '%+v'", *request)
+	log.Printf("Routing Info: '%+v\n'", *routeInfo)
+	log.Printf("Request to Route: '%+v\n'", *request)
 	resp := &events.APIGatewayProxyResponse{
 		Headers:    make(map[string]string),
 		StatusCode: http.StatusOK,
@@ -232,14 +254,12 @@ func routeRequestWaitForResp(routeInfo *funcRoutingInfo, request *events.APIGate
 		return resp, err
 	}
 
-	log.Printf("Host: %s", req.Host)
-
 	routedResp, err := routerClient.Do(req)
 	if err != nil {
 		setInternalErrCode(resp, err.Error())
 		return resp, err
 	}
-	log.Printf("Routed Response: %+v", routedResp)
+	log.Printf("Routed Response: %+v\n", routedResp)
 
 	defer routedResp.Body.Close()
 	resp.StatusCode = routedResp.StatusCode
@@ -255,13 +275,14 @@ func routeRequestWaitForResp(routeInfo *funcRoutingInfo, request *events.APIGate
 	}
 	resp.Body = string(body)
 
-	resp.Headers["Content-Type"] = routedResp.Header.Get("Content-Type")
+	resp.Headers[contentTypeHeader] = routedResp.Header.Get(contentTypeHeader)
 	log.Printf("Delegate Function Response: '%+v'\n", resp)
 	return resp, err
 }
 
 func main() {
-	loadCommandRegistryFromContents([]byte(tempCmdReg), &commandRegistry)
-	log.Printf("Command Registry: %+v\n", commandRegistry)
+	// TODO Perform smart loading of contents for local testing. Flags > Local Variables > Environment Variable > Configuration File search.
+	loadCommandRegistryFromUrl(registryUrl, &commandRegistry)
+	log.Printf("Loaded Command Registry: %+v\n", commandRegistry)
 	lambda.Start(handler)
 }

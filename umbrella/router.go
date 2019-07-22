@@ -13,9 +13,11 @@ import (
 	"net/url"
 	"path"
 	"strings"
+	"time"
 )
 
 const (
+	timeout               = 2
 	forbiddenErrRespMsg   = "uh uh uh...you didn't say the magic word."
 	internalErrRespMsg    = "Sorry...we uh...messed up."
 	logMsg                = "%s, %s"
@@ -35,6 +37,11 @@ const (
                 "usage" : "/struggle functionname arg1 arg2 arg3...",
                 "description" : "This describes what your function does when they use /struggle help functionName. This should also describe how it uses the arguments.",
                 "manual" : "Optional documentation website for your command."
+            },
+            "randxkcd" : {
+                "usage" : "/struggle randxkcd",
+                "description" : "Returns a random xkcd comic.",
+                "manual" : "THERE IS NO DOCUMENTATION WEBSITE. MAKE YOUR OWN."                
             }
         }
     }
@@ -98,13 +105,15 @@ func getFuncRoutingInfo(values url.Values, cmdReg *map[string]cmdInfo) (*funcRou
 		return nil, fmt.Errorf("Function was not registered. Function Name: '%s'", funcName)
 	}
 
-	requestUrlRoot := cmdInfo.RequestUrl
-	if requestUrlRoot == "" {
-		return nil, errors.New("Request URL root was not configured.")
+	requestUrlRoot, err := url.Parse(cmdInfo.RequestUrl)
+	if err != nil {
+		return nil, err
 	}
 
+	requestUrl := requestUrlRoot
+	requestUrl.Path = path.Join(requestUrlRoot.Path, funcName)
 	funcRoutingInfo.Name = funcName
-	funcRoutingInfo.RequestUrl = path.Join(requestUrlRoot, funcName)
+	funcRoutingInfo.RequestUrl = requestUrl.String()
 	return &funcRoutingInfo, nil
 }
 
@@ -198,17 +207,57 @@ func handler(request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResp
 	}
 	funcRoutingInfo.ResponseUrl = responseUrlList[0]
 
-	go routeRequest(funcRoutingInfo, &request)
+	resp, err = routeRequestWaitForResp(funcRoutingInfo, &request)
 
 	log.Printf(logMsg, http.StatusText(http.StatusOK), resp.Body)
 	return resp, nil
 }
 
-func routeRequest(routingInfo *funcRoutingInfo, request *events.APIGatewayProxyRequest) {
-	// TODO Build request.
-	// TODO Open connection.
-	// TODO Transmit request.
-	log.Printf("Routing Info: '%+v'", *routingInfo)
+func routeRequestWaitForResp(routeInfo *funcRoutingInfo, request *events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
+	log.Printf("Routing Info: '%+v'", *routeInfo)
+	log.Printf("Request to Route: '%+v'", *request)
+	resp := &events.APIGatewayProxyResponse{
+		Headers:    make(map[string]string),
+		StatusCode: http.StatusOK,
+		Body:       http.StatusText(http.StatusOK),
+	}
+
+	routerClient := http.Client{
+		Timeout: time.Second * timeout,
+	}
+
+	req, err := http.NewRequest(http.MethodPost, routeInfo.RequestUrl, strings.NewReader(request.Body))
+	if err != nil {
+		setInternalErrCode(resp, err.Error())
+		return resp, err
+	}
+
+	log.Printf("Host: %s", req.Host)
+
+	routedResp, err := routerClient.Do(req)
+	if err != nil {
+		setInternalErrCode(resp, err.Error())
+		return resp, err
+	}
+	log.Printf("Routed Response: %+v", routedResp)
+
+	defer routedResp.Body.Close()
+	resp.StatusCode = routedResp.StatusCode
+	if err != nil {
+		setInternalErrCode(resp, err.Error())
+		return resp, err
+	}
+
+	body, err := ioutil.ReadAll(routedResp.Body)
+	if err != nil {
+		setInternalErrCode(resp, err.Error())
+		return resp, err
+	}
+	resp.Body = string(body)
+
+	resp.Headers["Content-Type"] = routedResp.Header.Get("Content-Type")
+	log.Printf("Delegate Function Response: '%+v'\n", resp)
+	return resp, err
 }
 
 func main() {

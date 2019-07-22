@@ -18,6 +18,8 @@ const (
 	timeOut             = 2
 	contentTypeHeader   = "Content-type"
 	contentTypeJson     = "application/json"
+	slackInChannel      = "in_channel"
+	slackEphemeral      = "ephemeral"
 )
 
 type xkcdComicInfo struct {
@@ -88,7 +90,7 @@ func handler(request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResp
 
 	slackResp := &slackResponse{
 		Text:          randXkcdComicInfo.Img + "\n" + randXkcdComicInfo.Title,
-		Response_type: "in_channel",
+		Response_type: slackInChannel,
 		Attachments: []slackAttachment{
 			slackAttachment{
 				Text: randXkcdComicInfo.Alt,

@@ -2,11 +2,11 @@
   command = "make build"
   functions = "./functions"
   publish = "public/"
-[build.staging.environment]
+[context.staging.environment]
   ROUTER_REGISTRY_URL_ENV_VAR = "https://struggle-slack-app-beta.netlify.com/slack-app-registry.json"
   GO_IMPORT_PATH = "github.com/junior-dev-struggle-bus/struggle-slack-app"
   GOBIN = "/opt/build/repo/functions"
-[build.master.environment]
+[context.master.environment]
   ROUTER_REGISTRY_URL_ENV_VAR = "https://struggle-slack-app.netlify.com/slack-app-registry.json"
   GO_IMPORT_PATH = "github.com/junior-dev-struggle-bus/struggle-slack-app"
   GOBIN = "/opt/build/repo/functions"

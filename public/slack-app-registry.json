@@ -1,6 +1,6 @@
 {
     "struggle" : {
-        "requestUrl" : "https://admiring-meninsky-dcfbdb.netlify.com/.netlify/functions/",
+        "requestUrl" : "https://struggle-slack-app-beta.netlify.com/.netlify/functions/",
         "helpKeyword" : "help",
         "functions" : {
             "functionName" : {

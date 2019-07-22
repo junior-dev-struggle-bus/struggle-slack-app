@@ -1,11 +1,16 @@
-# example netlify.toml
 [build]
   command = "make build"
   functions = "./functions"
   publish = "public/"
-[build.environment]
-  GO_IMPORT_PATH = "github.com/phoenixcoder/serverless-request-router"
+[build.staging.environment]
+  ROUTER_REGISTRY_URL_ENV_VAR = "https://struggle-slack-app-beta.netlify.com/slack-app-registry.json"
+  GO_IMPORT_PATH = "github.com/junior-dev-struggle-bus/struggle-slack-app"
   GOBIN = "/opt/build/repo/functions"
+[build.master.environment]
+  ROUTER_REGISTRY_URL_ENV_VAR = "https://struggle-slack-app.netlify.com/slack-app-registry.json"
+  GO_IMPORT_PATH = "github.com/junior-dev-struggle-bus/struggle-slack-app"
+  GOBIN = "/opt/build/repo/functions"
+
 
   ## Uncomment to use this redirect for Single Page Applications like create-react-app. 
   ## Not needed for static site generators.

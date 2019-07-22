@@ -18,20 +18,19 @@ import (
 )
 
 const (
-	timeout             = 2
-	forbiddenErrRespMsg = "uh uh uh...you didn't say the magic word."
-	internalErrRespMsg  = "Sorry...we uh...messed up."
-	// TODO Make sure internal error messages are transferred across more friendly-like.
+	timeout                 = 2
+	forbiddenErrRespMsg     = "uh uh uh...you didn't say the magic word."
+	internalErrRespMsg      = "Sorry...we uh...messed up."
 	funcNotFoundErrMsgFmt   = "We're embarrassed for you, but we don't know a '%s'. Try these instead:\n'%s'"
 	logMsg                  = "%s, %s"
 	routerRegistryUrlEnvVar = "ROUTER_REGISTRY_URL_ENV_VAR"
-	commandRegistryLoc      = "./registry.json"
 	cmdRequestUrlRoot       = "requestUrl"
 	cmdFunctionsReg         = "functions"
 	contentTypeHeader       = "content-type"
-	slackCmdParam           = "command"
-	slackArgsParam          = "text"
-	slackResponseUrlParam   = "response_url"
+	// TODO Move these to a Slack-specific package.
+	slackCmdParam         = "command"
+	slackArgsParam        = "text"
+	slackResponseUrlParam = "response_url"
 )
 
 var (
@@ -212,7 +211,7 @@ func handler(request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResp
 
 	resp, err = routeRequestWaitForResp(funcRoutingInfo, &request)
 
-	log.Printf(logMsg, http.StatusText(http.StatusOK), resp.Body)
+	log.Printf(logMsg, http.StatusText(resp.StatusCode), resp.Body)
 	return resp, nil
 }
 

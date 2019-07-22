@@ -24,6 +24,7 @@ const (
 	funcNotFoundErrMsgFmt   = "We're embarrassed for you, but we don't know a '%s'. Try these instead:\n'%s'"
 	logMsg                  = "%s, %s"
 	routerRegistryUrlEnvVar = "ROUTER_REGISTRY_URL_ENV_VAR"
+	requestUrlRootEnvVar    = "REQUEST_URL_ROOT"
 	cmdRequestUrlRoot       = "requestUrl"
 	cmdFunctionsReg         = "functions"
 	contentTypeHeader       = "content-type"
@@ -38,6 +39,7 @@ var (
 	//      that can pull from any data source.
 	commandRegistry map[string]cmdInfo
 	registryUrl     = os.Getenv(routerRegistryUrlEnvVar)
+	requestUrlRoot  = os.Getenv(requestUrlRootEnvVar)
 )
 
 type cmdInfo struct {
@@ -56,7 +58,7 @@ type funcRoutingInfo struct {
 }
 
 // TODO Generalize away from Slack patterns.
-func getFuncRoutingInfo(values url.Values, cmdReg *map[string]cmdInfo) (*funcRoutingInfo, error) {
+func getFuncRoutingInfo(reqUrlRoot string, values url.Values, cmdReg *map[string]cmdInfo) (*funcRoutingInfo, error) {
 	// TODO Polish the error handling here for Slack.
 	cmdList, cmdOk := values[slackCmdParam]
 	if !cmdOk {
@@ -93,13 +95,13 @@ func getFuncRoutingInfo(values url.Values, cmdReg *map[string]cmdInfo) (*funcRou
 		return nil, fmt.Errorf("Function was not registered. Function Name: '%s'", funcName)
 	}
 
-	requestUrlRoot, err := url.Parse(cmdInfo.RequestUrl)
+	parsedRequestUrlRoot, err := url.Parse(reqUrlRoot)
 	if err != nil {
 		return nil, err
 	}
 
-	requestUrl := requestUrlRoot
-	requestUrl.Path = path.Join(requestUrlRoot.Path, funcName)
+	requestUrl := parsedRequestUrlRoot
+	requestUrl.Path = path.Join(parsedRequestUrlRoot.Path, funcName)
 	funcRoutingInfo.Name = funcName
 	funcRoutingInfo.RequestUrl = requestUrl.String()
 	return &funcRoutingInfo, nil
@@ -189,7 +191,7 @@ func handler(request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResp
 		return resp, nil
 	}
 
-	funcRoutingInfo, err := getFuncRoutingInfo(values, &commandRegistry)
+	funcRoutingInfo, err := getFuncRoutingInfo(requestUrlRoot, values, &commandRegistry)
 	if err != nil {
 		setInternalErrCode(resp, err.Error())
 		return resp, nil

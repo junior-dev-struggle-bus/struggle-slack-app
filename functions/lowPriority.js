@@ -1,10 +1,21 @@
+import querystring from 'querystring'
+
 exports.handler = function (event, context, callback) {
 
     console.log(`Event body: ${event.body}`)
 
-    const invokedByUser = event.body.user_name
+    let base64Body = new Buffer(event.body, 'base64')
+    console.log(`Buffer: ${base64Body}`)
 
-    console.log(`User name var: ${invokedByUser}`)
+    let queryString = base64Body.toString('ascii')
+    console.log(`Decoded query string: ${queryString}`)
+
+    let queryObject = querystring.parse(queryString)
+    console.log(`Parsed Query object: ${queryObject}`)
+
+    let invokedByUser = queryObject.user_name
+    console.log(`Invoking by user: ${invokedByuser}`)
+
 
     const res = {
         response_type: "in_channel",

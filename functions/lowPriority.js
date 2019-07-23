@@ -13,7 +13,7 @@ exports.handler = function (event, context, callback) {
     let queryObject = querystring.parse(queryParams)
 
     let invokedByUser = queryObject.user_name
-    console.log(`Invoking by user: ${invokedByuser}`)
+    console.log(`Invoking by user: ${invokedByUser}`)
 
 
     const res = {

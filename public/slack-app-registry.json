@@ -12,7 +12,12 @@
                 "usage" : "/struggle randxkcd",
                 "description" : "Returns a random xkcd comic.",
                 "manual" : "THERE IS NO DOCUMENTATION WEBSITE. MAKE YOUR OWN."                
-            }
+            },
+	    "lowPriority" : {
+		"usage" : "/struggle lowPriority",
+		"description" : "Mark has no idea what this function does.",
+		"manual" : "Hope Brett doesn't kill us."
+	    }
         }
     }
 }

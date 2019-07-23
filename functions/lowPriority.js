@@ -1,6 +1,10 @@
 exports.handler = function (event, context, callback) {
 
+    console.log(`Event body: ${event.body}`)
+
     const invokedByUser = event.body.user_name
+
+    console.log(`User name var: ${invokedByUser}`)
 
     const res = {
         response_type: "in_channel",
@@ -11,6 +15,8 @@ exports.handler = function (event, context, callback) {
             }
         ]
     }
+
+    console.log(`Response object before callback: ${res}`)
 
     callback(null, {
         statusCode: 200,

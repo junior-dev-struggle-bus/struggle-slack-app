@@ -13,5 +13,4 @@
 5. [Create a Pull Request](https://help.github.com/en/articles/creating-a-pull-request) against this repo.
 6. Ping a repo owner or collaborator to review your code either here or on our [JDSB Slack workspace in the #struggle-app-project channel](https://join.slack.com/t/jdsb/shared_invite/enQtNzA0NTY3OTE2ODg3LTE5ZTE5ODI5YmE5YTUzN2UyOWUxZmM1ZDZlNDliZTgxYTg0ODRlMmM3OThkY2JlZDRlNjIzYmJiMjNjNDBjOWQ).
 7. Once approved and merged, yourFunctionName will be testable in the [JDSB Testing Ground Slack workspace](https://join.slack.com/t/jdsb-wrecking-ball/shared_invite/enQtNjgyMjA3NzU4MzIyLWMyNjIyZDY3ZDkwMTdiY2VlNDhlNDg2YTYyODQ3ZjRlZjA1NTZiNmNhZjcyNDM5MDhiNDliMmFmMzExOTJiNTk).
-8. After some QA testing, we'll merge your code into the production branch where it'll be available for all to use in the [JDSB Slack workspace](https://join.slack.com/t/jdsb\
-    /shared_invite/enQtNzA0NTY3OTE2ODg3LTE5ZTE5ODI5YmE5YTUzN2UyOWUxZmM1ZDZlNDliZTgxYTg0ODRlMmM3OThkY2JlZDRlNjIzYmJiMjNjNDBjOWQ).
+8. After some QA testing, we'll merge your code into the production branch where it'll be available for all to use in the [JDSB Slack workspace](https://join.slack.com/t/jdsb\/shared_invite/enQtNzA0NTY3OTE2ODg3LTE5ZTE5ODI5YmE5YTUzN2UyOWUxZmM1ZDZlNDliZTgxYTg0ODRlMmM3OThkY2JlZDRlNjIzYmJiMjNjNDBjOWQ).

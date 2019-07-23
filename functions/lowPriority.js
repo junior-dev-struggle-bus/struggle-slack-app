@@ -7,11 +7,10 @@ exports.handler = function (event, context, callback) {
     let base64Body = new Buffer(event.body, 'base64')
     console.log(`Buffer: ${base64Body}`)
 
-    let queryString = base64Body.toString('ascii')
-    console.log(`Decoded query string: ${queryString}`)
+    let queryParams = base64Body.toString('ascii')
+    console.log(`Decoded query string: ${queryParams}`)
 
-    let queryObject = querystring.parse(queryString)
-    console.log(`Parsed Query object: ${queryObject}`)
+    let queryObject = querystring.parse(queryParams)
 
     let invokedByUser = queryObject.user_name
     console.log(`Invoking by user: ${invokedByuser}`)

@@ -1,7 +1,7 @@
 exports.handler = function (event, context, callback) {
 
     const res = {
-        response_type: "ephemeral",
+        response_type: "in_channel",
         text: "http://devhumor.com/content/uploads/images/July2019/mvp_bugs.png"
     }
 

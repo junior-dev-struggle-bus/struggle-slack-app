@@ -1,9 +1,13 @@
 exports.handler = function (event, context, callback) {
 
-    const launchesNextWeek = `<html><body><img alt="Funny laughs and good times" src="http://devhumor.com/content/uploads/images/July2019/mvp_bugs.png"/><</body></html>`
+    const res = {
+        response_type: "in_channel",
+        text: "http://devhumor.com/content/uploads/images/July2019/mvp_bugs.png"
+    }
 
     callback(null, {
         statusCode: 200,
+        headers: { "Content-Type": "application/json" },
         body: launchesNextWeek
     })
 }

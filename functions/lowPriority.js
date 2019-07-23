@@ -1,6 +1,6 @@
 exports.handler = function (event, context, callback) {
 
-    const invokedByUser = event.queryStringParameters.user_name
+    const invokedByUser = event.body.user_name
 
     const res = {
        response_type: "in_channel",

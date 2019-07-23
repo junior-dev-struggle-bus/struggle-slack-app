@@ -5,9 +5,11 @@ exports.handler = function (event, context, callback) {
     const res = {
         response_type: "in_channel",
         text: "http://devhumor.com/content/uploads/images/July2019/mvp_bugs.png",
-        attachments: {
-            text: `Hey ${invokedByUser}! lowPriority is a simple Netlify function created by @Brett Hurst for the Struggle Buddy slack app. You should make it a highPriority to create your own! :D`
-        }
+        attachments: [
+            {
+                text: `Hey ${invokedByUser}! lowPriority is a simple Netlify function created by @Brett Hurst for the Struggle Buddy slack app. You should make it a highPriority to create your own! :D`
+            }
+        ]
     }
 
     callback(null, {

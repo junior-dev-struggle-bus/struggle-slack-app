@@ -2,8 +2,8 @@
 
 ## Contributing
 1. [Fork this repo](https://help.github.com/en/articles/fork-a-repo#fork-an-example-repository).
-2. Add your beautiful JS code to the functions/ folder.
-3. Register your function with the public/slack-app-registry.json under the "functions" entry. Here's a [real-life reference](https://github.com/junior-dev-struggle-bus/struggle-slack-app/commit/0ff6622028e87e0729fc97feda3c4080f4606eb1). Otherwise, the general form is below:
+2. Add your beautiful JS code to the [functions/ folder](https://github.com/junior-dev-struggle-bus/struggle-slack-app/tree/staging/functions).
+3. Register your function with the [public/slack-app-registry.json](https://github.com/junior-dev-struggle-bus/struggle-slack-app/blob/staging/public/slack-app-registry.json) under the "functions" entry. Here's a [real-life reference](https://github.com/junior-dev-struggle-bus/struggle-slack-app/commit/0ff6622028e87e0729fc97feda3c4080f4606eb1). Otherwise, the general form is below:
 ```json
    "yourFunctionName" : {
         "usage" : "/struggle yourFunctionName faveArg lessFaveArg worstArg -OR- anything, this gets displayed to the user.",

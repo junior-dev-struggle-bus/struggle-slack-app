@@ -4,9 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/aws/aws-lambda-go/events"
-	"github.com/aws/aws-lambda-go/lambda"
-	slackauth "github.com/phoenixcoder/slack-golang-sdk/auth"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -15,6 +12,10 @@ import (
 	"path"
 	"strings"
 	"time"
+
+	"github.com/aws/aws-lambda-go/events"
+	"github.com/aws/aws-lambda-go/lambda"
+	slackauth "github.com/phoenixcoder/slack-golang-sdk/auth"
 )
 
 const (
@@ -55,6 +56,20 @@ type funcRoutingInfo struct {
 	Usage       string
 	Description string
 	Manual      string
+}
+
+// Function to compare a lowercase version of the requested slack command to a lowercase registry command
+// Probably doesn't work because you would have to check against every command in the registry and transform them
+// Also, not sure where to call it. Presumably within the first few error checks of getFuncRoutingInfo()
+func compareCmdToReg(reqCmd string, regCmd string) {
+	lowercaseReqCmd := strings.ToLower(reqCmd)
+	lowercaseRegCmd := strings.ToLower(regCmd)
+
+	if lowercaseReqCmd != lowercaseRegCmd {
+		return false
+	}
+
+	return true
 }
 
 // TODO Generalize away from Slack patterns.

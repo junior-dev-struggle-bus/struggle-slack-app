@@ -58,18 +58,15 @@ type funcRoutingInfo struct {
 	Manual      string
 }
 
-// Function to compare a lowercase version of the requested slack command to a lowercase registry command
-// Probably doesn't work because you would have to check against every command in the registry and transform them
-// Also, not sure where to call it. Presumably within the first few error checks of getFuncRoutingInfo()
-func compareCmdToReg(reqCmd string, regCmd string) {
-	lowercaseReqCmd := strings.ToLower(reqCmd)
-	lowercaseRegCmd := strings.ToLower(regCmd)
-
-	if lowercaseReqCmd != lowercaseRegCmd {
-		return false
+// confirmFunctionIsRegistered is designed to eliminate case sensitivity when calling a registered function.
+// EqualFold() is used to determine that the requested function is equal to a registered function under Unicode case-folding.
+func confirmFunctionIsRegistered(reqFunc string, funcReg *map[string]funcRoutingInfo) (string, error) {
+	for key, _ := range funcReg {
+		if strings.EqualFold(reqFunc, key) {
+			return key, nil
+		}
 	}
-
-	return true
+	return nil, fmt.Errorf("Function was not registered. Function Name: '%s'", reqFunc)
 }
 
 // TODO Generalize away from Slack patterns.
@@ -105,7 +102,12 @@ func getFuncRoutingInfo(reqUrlRoot string, values url.Values, cmdReg *map[string
 	}
 
 	funcName := argsList[0]
-	funcRoutingInfo, funcRoutingInfoOk := funcReg[funcName]
+	confirmedFuncName, err := confirmFunctionIsRegistered(funcName, funcReg)
+	if err != nil {
+		return nil, err
+	}
+
+	funcRoutingInfo, funcRoutingInfoOk := funcReg[confirmedFuncName]
 	if !funcRoutingInfoOk {
 		return nil, fmt.Errorf("Function was not registered. Function Name: '%s'", funcName)
 	}

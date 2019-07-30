@@ -59,13 +59,17 @@ type funcRoutingInfo struct {
 }
 
 // confirmFunctionIsRegistered is designed to return function registry info regardless of case sensitivity.
-func confirmFunctionIsRegistered(reqFunc string, funcReg *map[string]funcRoutingInfo) (string, error) {
+func confirmFunctionIsRegistered(reqFunc string, funcReg map[string]funcRoutingInfo) (funcRoutingInfo, bool) {
+
+	funcRoutingInfo, funcRoutingInfoOk := funcReg[reqFunc]
+
 	for key := range funcReg {
 		if strings.EqualFold(reqFunc, key) {
-			return funcReg[key], nil
+			funcRoutingInfo, funcRoutingInfoOk = funcReg[key]
+			break
 		}
 	}
-	return nil, fmt.Errorf("Function was not registered. Function Name: '%s'", reqFunc)
+	return funcRoutingInfo, funcRoutingInfoOk
 }
 
 // TODO Generalize away from Slack patterns.
@@ -101,9 +105,9 @@ func getFuncRoutingInfo(reqUrlRoot string, values url.Values, cmdReg *map[string
 	}
 
 	funcName := argsList[0]
-	funcRoutingInfo, err := confirmFunctionIsRegistered(funcName, funcReg)
-	if err != nil {
-		return nil, err
+	funcRoutingInfo, funcRoutingInfoOk := confirmFunctionIsRegistered(funcName, funcReg)
+	if !funcRoutingInfoOk {
+		return nil, fmt.Errorf("Function was not registered. Function Name: '%s'", funcName)
 	}
 
 	parsedRequestUrlRoot, err := url.Parse(reqUrlRoot)

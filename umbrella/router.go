@@ -58,12 +58,11 @@ type funcRoutingInfo struct {
 	Manual      string
 }
 
-// confirmFunctionIsRegistered is designed to eliminate case sensitivity when calling a registered function.
-// EqualFold() is used to determine that the requested function is equal to a registered function under Unicode case-folding.
+// confirmFunctionIsRegistered is designed to return function registry info regardless of case sensitivity.
 func confirmFunctionIsRegistered(reqFunc string, funcReg *map[string]funcRoutingInfo) (string, error) {
-	for key, _ := range funcReg {
+	for key := range funcReg {
 		if strings.EqualFold(reqFunc, key) {
-			return key, nil
+			return funcReg[key], nil
 		}
 	}
 	return nil, fmt.Errorf("Function was not registered. Function Name: '%s'", reqFunc)
@@ -102,14 +101,9 @@ func getFuncRoutingInfo(reqUrlRoot string, values url.Values, cmdReg *map[string
 	}
 
 	funcName := argsList[0]
-	confirmedFuncName, err := confirmFunctionIsRegistered(funcName, funcReg)
+	funcRoutingInfo, err := confirmFunctionIsRegistered(funcName, funcReg)
 	if err != nil {
 		return nil, err
-	}
-
-	funcRoutingInfo, funcRoutingInfoOk := funcReg[confirmedFuncName]
-	if !funcRoutingInfoOk {
-		return nil, fmt.Errorf("Function was not registered. Function Name: '%s'", funcName)
 	}
 
 	parsedRequestUrlRoot, err := url.Parse(reqUrlRoot)

@@ -4,9 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/aws/aws-lambda-go/events"
-	"github.com/aws/aws-lambda-go/lambda"
-	slackauth "github.com/phoenixcoder/slack-golang-sdk/auth"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -15,6 +12,10 @@ import (
 	"path"
 	"strings"
 	"time"
+
+	"github.com/aws/aws-lambda-go/events"
+	"github.com/aws/aws-lambda-go/lambda"
+	slackauth "github.com/phoenixcoder/slack-golang-sdk/auth"
 )
 
 const (
@@ -57,6 +58,20 @@ type funcRoutingInfo struct {
 	Manual      string
 }
 
+// confirmFunctionIsRegistered is designed to return function registry info regardless of case sensitivity.
+func confirmFunctionIsRegistered(reqFunc string, funcReg map[string]funcRoutingInfo) (funcRoutingInfo, bool) {
+
+	funcRoutingInfo, funcRoutingInfoOk := funcReg[reqFunc]
+
+	for key := range funcReg {
+		if strings.EqualFold(reqFunc, key) {
+			funcRoutingInfo, funcRoutingInfoOk = funcReg[key]
+			break
+		}
+	}
+	return funcRoutingInfo, funcRoutingInfoOk
+}
+
 // TODO Generalize away from Slack patterns.
 func getFuncRoutingInfo(reqUrlRoot string, values url.Values, cmdReg *map[string]cmdInfo) (*funcRoutingInfo, error) {
 	// TODO Polish the error handling here for Slack.
@@ -90,7 +105,7 @@ func getFuncRoutingInfo(reqUrlRoot string, values url.Values, cmdReg *map[string
 	}
 
 	funcName := argsList[0]
-	funcRoutingInfo, funcRoutingInfoOk := funcReg[funcName]
+	funcRoutingInfo, funcRoutingInfoOk := confirmFunctionIsRegistered(funcName, funcReg)
 	if !funcRoutingInfoOk {
 		return nil, fmt.Errorf("Function was not registered. Function Name: '%s'", funcName)
 	}

@@ -17,6 +17,11 @@
                 "usage" : "/struggle lowPriority",
                 "description" : "Mark has no idea what this function does.",
                 "manual" : "Hope Brett doesn't kill us."
+            },
+            "inviteme" : {
+                "usage" : "/struggle dev invite",
+                "description" : "Returns a link that will send automated invite to jdsb-wrecking-ball workspace",
+                "manual" : "Just type `/struggle dev invite` in slack channel"
             }
         }
     }

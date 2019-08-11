@@ -3,8 +3,8 @@
   functions = "./functions"
   publish = "public/"
 [context.staging.environment]
-  ROUTER_REGISTRY_URL_ENV_VAR = "https://struggle-slack-app-beta.netlify.com/slack-app-registry.json"
-  GO_IMPORT_PATH = "github.com/junior-dev-struggle-bus/struggle-slack-app"
+  ROUTER_REGISTRY_URL_ENV_VAR = "https://lisas-first-serverless-func-test.netlify.com/slack-app-registry.json"
+  GO_IMPORT_PATH = "github.com/kimlisa/struggle-slack-app"
   GOBIN = "/opt/build/repo/functions"
 [context.master.environment]
   ROUTER_REGISTRY_URL_ENV_VAR = "https://struggle-slack-app.netlify.com/slack-app-registry.json"

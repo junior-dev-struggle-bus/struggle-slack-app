@@ -19,9 +19,10 @@
                 "manual" : "Hope Brett doesn't kill us."
             },
             "inviteme" : {
-                "usage" : "/struggle dev invite",
+                "author": "Lisa Kim",
+                "usage" : "/struggle inviteme",
                 "description" : "Returns a link that will send automated invite to jdsb-wrecking-ball workspace",
-                "manual" : "Just type `/struggle dev invite` in slack channel"
+                "manual" : "Just type `/struggle inviteme` in slack channel"
             }
         }
     }

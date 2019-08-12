@@ -11,12 +11,12 @@ import (
 )
 
 const (
-	inviteLink    string = "https://jdsb-test-ground-slack-invite.herokuapp.com/"
-	imageLink     string = "http://giphygifs.s3.amazonaws.com/media/5q7XU3MurT0pW/giphy.gif"
-	imageText     string = "I came in like a wrecking ball"
-	imageAltText  string = "Picture of a cat wrecking neatly stacked books"
-	linkMsg       string = "Click on the link below to get an invite to *jdsb-wrecking-ball* workspace: "
-	myJdsbSlackID        = "UGAA0BJ4R"
+	inviteLink    = "https://jdsb-test-ground-slack-invite.herokuapp.com/"
+	imageLink     = "http://giphygifs.s3.amazonaws.com/media/5q7XU3MurT0pW/giphy.gif"
+	imageText     = "I came in like a wrecking ball"
+	imageAltText  = "Picture of a cat wrecking neatly stacked books"
+	linkMsg       = "Click on the link below to get an invite to *jdsb-wrecking-ball* workspace: "
+	myJdsbSlackID = "UGAA0BJ4R"
 )
 
 var (

@@ -69,14 +69,13 @@ const (
 	STypeMarkDown         = "mrkdwn"
 	STypePlain            = "plain_text"
 	STypeResponse         = "in_channel"
-	STypeImage            = "image"
 )
 
 // vars related to slack: headers and error messages
 var (
 	JSONHeader             = map[string]string{HeaderContentType: HeaderContentTypeJSON}
-	ErrEmptyRequestBody    = errors.New("APIGatewayProxyRequest.Body empty")
 	ErrParseRequestBody    = errors.New("unable to parse APIGatewayProxyRequest.Body")
 	ErrDecodingParsedQuery = errors.New("unable to decode parsed query into a struct")
 	ErrJSONMarshal         = errors.New("unable to JSON encode for response")
+	ErrAuthLambdaReq       = errors.New("unable to authenticate lambda request")
 )

@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/gorilla/schema"
+	slackauth "github.com/phoenixcoder/slack-golang-sdk/auth"
 	"net/http"
 	"net/url"
 )
@@ -23,22 +24,40 @@ var (
 	decoder = schema.NewDecoder()
 )
 
+// Bad request is a 400 error, which blames the user for doing something wrong
+// Internal error is a 500 error, the service screwed up
+// ie: If no request.Body comes in, that meant Slack didn't send the body over (service error)
 func handler(request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
+	authOK, err := slackauth.AuthenticateLambdaReq(&request)
+	if err != nil {
+		return &events.APIGatewayProxyResponse{
+			StatusCode: http.StatusOK,
+			Body:       ErrAuthLambdaReq.Error(),
+		}, fmt.Errorf("%v: %v", ErrAuthLambdaReq, err)
+	}
+
+	if !authOK {
+		return &events.APIGatewayProxyResponse{
+			StatusCode: http.StatusOK,
+			Body:       ErrAuthLambdaReq.Error(),
+		}, fmt.Errorf("%v", ErrAuthLambdaReq)
+	}
+
 	parsedBody, err := url.ParseQuery(request.Body)
 	if err != nil {
 		return &events.APIGatewayProxyResponse{
-			StatusCode: http.StatusBadRequest,
-			Body:       fmt.Sprintf("%d: %s", http.StatusBadRequest, ErrParseRequestBody.Error()),
-		}, ErrParseRequestBody
+			StatusCode: http.StatusOK,
+			Body:       ErrParseRequestBody.Error(),
+		}, fmt.Errorf("%v: %v", ErrParseRequestBody, err)
 	}
 
 	var receivedData SlackRequestBody
 	err = decoder.Decode(&receivedData, parsedBody)
 	if err != nil {
 		return &events.APIGatewayProxyResponse{
-			StatusCode: http.StatusInternalServerError,
-			Body:       fmt.Sprintf("%d: %s", http.StatusInternalServerError, ErrDecodingParsedQuery.Error()),
-		}, ErrDecodingParsedQuery
+			StatusCode: http.StatusOK,
+			Body:       ErrDecodingParsedQuery.Error(),
+		}, fmt.Errorf("%v: %v", ErrDecodingParsedQuery, err)
 	}
 
 	blockSection := SlackBlockSection{
@@ -52,7 +71,7 @@ func handler(request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResp
 	blockDivider := SlackBlockDivider{Type: SBlockDivider}
 
 	blockImage := SlackBlockImage{
-		Type: STypeImage,
+		Type: SBlockImage,
 		Title: SlackTypeText{
 			Type: STypePlain,
 			Text: imageText,
@@ -86,9 +105,9 @@ func handler(request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResp
 	slackPayloadByte, err := json.Marshal(slackPayload)
 	if err != nil {
 		return &events.APIGatewayProxyResponse{
-			StatusCode: http.StatusInternalServerError,
-			Body:       fmt.Sprintf("%d: %s", http.StatusInternalServerError, ErrJSONMarshal.Error()),
-		}, ErrJSONMarshal
+			StatusCode: http.StatusOK,
+			Body:       ErrJSONMarshal.Error(),
+		}, fmt.Errorf("%v: %v", ErrJSONMarshal, err)
 	}
 
 	return &events.APIGatewayProxyResponse{

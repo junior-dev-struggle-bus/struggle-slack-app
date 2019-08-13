@@ -13,11 +13,17 @@
                 "description" : "Returns a random xkcd comic.",
                 "manual" : "THERE IS NO DOCUMENTATION WEBSITE. MAKE YOUR OWN."                
             },
-	    "lowPriority" : {
-		"usage" : "/struggle lowPriority",
-		"description" : "Mark has no idea what this function does.",
-		"manual" : "Hope Brett doesn't kill us."
-	    }
+            "lowPriority" : {
+                "usage" : "/struggle lowPriority",
+                "description" : "Mark has no idea what this function does.",
+                "manual" : "Hope Brett doesn't kill us."
+            },
+            "inviteme" : {
+                "author": "Lisa Kim",
+                "usage" : "/struggle inviteme",
+                "description" : "Returns a link that will send automated invite to jdsb-wrecking-ball workspace",
+                "manual" : "Just type `/struggle inviteme` in slack channel"
+            }
         }
     }
 }

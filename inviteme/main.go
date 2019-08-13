@@ -24,74 +24,71 @@ var (
 	decoder = schema.NewDecoder()
 )
 
-// Bad request is a 400 error, which blames the user for doing something wrong
-// Internal error is a 500 error, the service screwed up
-// ie: If no request.Body comes in, that meant Slack didn't send the body over (service error)
 func handler(request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 	authOK, err := slackauth.AuthenticateLambdaReq(&request)
 	if err != nil {
 		return &events.APIGatewayProxyResponse{
 			StatusCode: http.StatusOK,
-			Body:       ErrAuthLambdaReq.Error(),
-		}, fmt.Errorf("%v: %v", ErrAuthLambdaReq, err)
+			Body:       userFriendlyErrorMsg,
+		}, fmt.Errorf("%v: %v", errAuthLambdaReq, err)
 	}
 
 	if !authOK {
 		return &events.APIGatewayProxyResponse{
 			StatusCode: http.StatusOK,
-			Body:       ErrAuthLambdaReq.Error(),
-		}, fmt.Errorf("%v", ErrAuthLambdaReq)
+			Body:       userFriendlyErrorMsg,
+		}, fmt.Errorf("%v", errAuthLambdaReq)
 	}
 
 	parsedBody, err := url.ParseQuery(request.Body)
 	if err != nil {
 		return &events.APIGatewayProxyResponse{
 			StatusCode: http.StatusOK,
-			Body:       ErrParseRequestBody.Error(),
-		}, fmt.Errorf("%v: %v", ErrParseRequestBody, err)
+			Body:       userFriendlyErrorMsg,
+		}, fmt.Errorf("%v: %v", errParseRequestBody, err)
 	}
 
-	var receivedData SlackRequestBody
+	var receivedData slackRequestBody
 	err = decoder.Decode(&receivedData, parsedBody)
 	if err != nil {
 		return &events.APIGatewayProxyResponse{
 			StatusCode: http.StatusOK,
-			Body:       ErrDecodingParsedQuery.Error(),
-		}, fmt.Errorf("%v: %v", ErrDecodingParsedQuery, err)
+			Body:       userFriendlyErrorMsg,
+		}, fmt.Errorf("%v: %v", errDecodingParsedQuery, err)
 	}
 
-	blockSection := SlackBlockSection{
-		Type: SBlockSection,
-		Text: SlackTypeText{
-			Type: STypeMarkDown,
+	blockSection := slackBlockSection{
+		Type: sBlockSection,
+		Text: slackTypeText{
+			Type: sTypeMarkDown,
 			Text: fmt.Sprintf("Hello <@%s>, fellow 🤓! \n%s\n\n🔗 %s 🔗", receivedData.UserID, linkMsg, inviteLink),
 		},
 	}
 
-	blockDivider := SlackBlockDivider{Type: SBlockDivider}
+	blockDivider := slackBlockDivider{Type: sBlockDivider}
 
-	blockImage := SlackBlockImage{
-		Type: SBlockImage,
-		Title: SlackTypeText{
-			Type: STypePlain,
+	blockImage := slackBlockImage{
+		Type: sBlockImage,
+		Title: slackTypeText{
+			Type: sTypePlain,
 			Text: imageText,
 		},
 		ImageURL: imageLink,
 		AltText:  imageAltText,
 	}
 
-	blockContext := SlackBlockContext{
-		Type: SBlockContext,
-		Elements: []SlackTypeText{
+	blockContext := slackBlockContext{
+		Type: sBlockContext,
+		Elements: []slackTypeText{
 			{
-				Type: STypeMarkDown,
+				Type: sTypeMarkDown,
 				Text: fmt.Sprintf("*Function by:* <@%s>", myJdsbSlackID),
 			},
 		},
 	}
 
-	slackPayload := SlackMessagePayload{
-		ResponseType: STypeResponse,
+	slackPayload := slackMessagePayload{
+		ResponseType: sTypeResponse,
 		ChannelName:  receivedData.ChannelName,
 		Token:        receivedData.Token,
 		Blocks: []interface{}{
@@ -106,12 +103,12 @@ func handler(request events.APIGatewayProxyRequest) (*events.APIGatewayProxyResp
 	if err != nil {
 		return &events.APIGatewayProxyResponse{
 			StatusCode: http.StatusOK,
-			Body:       ErrJSONMarshal.Error(),
-		}, fmt.Errorf("%v: %v", ErrJSONMarshal, err)
+			Body:       userFriendlyErrorMsg,
+		}, fmt.Errorf("%v: %v", errJSONMarshal, err)
 	}
 
 	return &events.APIGatewayProxyResponse{
-		Headers:    JSONHeader,
+		Headers:    jSONHeader,
 		StatusCode: http.StatusOK,
 		Body:       string(slackPayloadByte),
 	}, nil

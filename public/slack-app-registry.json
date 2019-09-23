@@ -13,11 +13,16 @@
                 "description" : "Returns a random xkcd comic.",
                 "manual" : "THERE IS NO DOCUMENTATION WEBSITE. MAKE YOUR OWN."                
             },
-	    "lowPriority" : {
-		"usage" : "/struggle lowPriority",
-		"description" : "Mark has no idea what this function does.",
-		"manual" : "Hope Brett doesn't kill us."
-	    }
+            "lowPriority": {
+                "usage": "/struggle lowPriority",
+                "description": "Mark has no idea what this function does.",
+                "manual": "Hope Brett doesn't kill us."
+            },
+            "starwars": {
+                "usage": "/struggle starwars <n>",
+                "description": "Show the opening scroll for the nth Star Wars movie, where <n> is an integer from 1-7.",
+                "manual": "Use the force."
+            }
         }
     }
 }
